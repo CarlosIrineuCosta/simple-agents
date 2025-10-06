@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+
+# Gemini Expect Wrapper for Complex Orchestration
+# Handles interactive mode of Gemini CLI if needed
+
+set timeout 60
+
+# Get prompt from command line
+if {[llength $argv] == 0} {
+    puts "Usage: $argv0 <prompt>"
+    exit 1
+}
+
+set prompt [lindex $argv 0]
+set model "gemini-1.5-pro"
+
+# Check for model override
+if {[info exists env(GEMINI_MODEL)]} {
+    set model $env(GEMINI_MODEL)
+}
+
+# Spawn the Gemini CLI with prompt
+spawn gemini -m $model "$prompt"
+
+# Wait for response
+expect {
+    timeout {
+        puts "Timeout waiting for Gemini response"
+        exit 1
+    }
+    eof {
+        # Normal completion
+    }
+}
+
+# Return success
+exit 0

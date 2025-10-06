@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+
+# Codex Expect Wrapper for Complex Orchestration
+# Handles interactive mode of Codex CLI if needed
+
+set timeout 60
+
+# Get prompt from command line
+if {[llength $argv] == 0} {
+    puts "Usage: $argv0 <prompt>"
+    exit 1
+}
+
+set prompt [lindex $argv 0]
+set model "gpt-4"
+
+# Check for model override
+if {[info exists env(CODEX_MODEL)]} {
+    set model $env(CODEX_MODEL)
+}
+
+# Spawn the Codex CLI with prompt
+spawn codex exec -m $model "$prompt"
+
+# Wait for response
+expect {
+    timeout {
+        puts "Timeout waiting for Codex response"
+        exit 1
+    }
+    eof {
+        # Normal completion
+    }
+}
+
+# Return success
+exit 0

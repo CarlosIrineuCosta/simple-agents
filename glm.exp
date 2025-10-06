@@ -1,0 +1,37 @@
+#!/usr/bin/expect -f
+
+# GLM Expect Wrapper for Complex Orchestration
+# This allows GLM to be called from expect-based orchestration systems
+
+set timeout 60
+
+# Get prompt from command line
+if {[llength $argv] == 0} {
+    puts "Usage: $argv0 <prompt>"
+    exit 1
+}
+
+set prompt [lindex $argv 0]
+
+# Check for API key
+if {![info exists env(GLM_API_KEY)]} {
+    puts "Error: GLM_API_KEY not set"
+    exit 1
+}
+
+# Spawn the GLM CLI
+spawn python3 glm_cli.py "$prompt"
+
+# Wait for response
+expect {
+    timeout {
+        puts "Timeout waiting for GLM response"
+        exit 1
+    }
+    eof {
+        # Normal completion
+    }
+}
+
+# Return success
+exit 0
